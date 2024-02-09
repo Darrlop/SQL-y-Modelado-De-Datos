@@ -51,9 +51,9 @@
      Se ha optado por ello al tratarse de una tabla virtual y temporal, que es borrada una 
      vez realizada la consulta.
 
-    · Se ha añadido una copia de película extra al Señor de Los Anillos (id 309) para tener
-     varias copias disponibles de un título y así poder testear que la consulta-1 funciona 
-     adecuadamente.
+    · Se ha añadido una copia de película extra al Señor de Los Anillos (con id 309) para tener
+     varias copias disponibles de un título en el resultado de la Consulta-1 y así poder testear 
+     que funciona adecuadamente.
 
     · En caso de que un cliente tenga un empate a número de películas alquiladas en más de
      un género, ofreceremos no un único género favorito, sino varios. 
