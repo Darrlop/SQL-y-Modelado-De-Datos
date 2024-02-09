@@ -7,20 +7,28 @@
 
 ¬ Cómo herramientas, he usado:
     
-    · **ElephantSQL** https://customer.elephantsql.com/ como servicio de alojamiento de la base de datos, en su modalidad gratuita "Tiny Turtle".
+    · **ElephantSQL** https://customer.elephantsql.com/ como servicio de alojamiento de la base de 
+    datos, en su modalidad gratuita "Tiny Turtle".
 
-    · **Dbeaver** como aplicación de software cliente de SQL y herramienta de administración de bases de datos. Es un software completo y muy versátil para administrar proyectos de BBDD si buscamos una opción gratuita.
+    · **Dbeaver** como aplicación de software cliente de SQL y herramienta de administración de bases
+     de datos. Es un software completo y muy versátil para administrar proyectos de BBDD si buscamos 
+     una opción gratuita.
 
 ¬ Las funcionalidades planteadas como requisitos mínimos serían:
 
-    · Registrar los socios del videoclub: nombre y apellidos, fecha de nacimiento, teléfono y su número de identificación (DNI). Se le asignará un número de socio.
+    · Registrar los socios del videoclub: nombre y apellidos, fecha de nacimiento, teléfono y su 
+     número de identificación (DNI). Se le asignará un número de socio.
     · Registrar la dirección postal de los socios :código postal, calle, número y piso es suficiente. 
-    · Registrar las películas. Puedo tener más de una copia de cada una. De cada película necesito: título, año de publicación, género, director y sinopsis.
-    · Necesito saber a que socio le he prestado cada copia y cuándo: fecha de préstamo y fecha de devolución. Se considera que la película está actualmente alquilada si no tiene fecha de devolución.
+    · Registrar las películas. Puedo tener más de una copia de cada una. De cada película necesito: 
+     título, año de publicación, género, director y sinopsis.
+    · Necesito saber a que socio le he prestado cada copia y cuándo: fecha de préstamo y fecha de 
+     devolución. Se considera que la película está actualmente alquilada si no tiene fecha de devolución.
 
     · Dos consultas:
-        ·· 1-Requerida: Qué películas están disponibles para alquilar en este momento (es decir, que no están prestadas). Se devuelve título y número de copias disponibles.
-        ·· 2-Optativa: Cuál es el género favorito de cada socios (el género del que tenga más préstamos). Se devuelve número de socio, nombre completo y género favorito.
+        ·· 1-Requerida: Qué películas están disponibles para alquilar en este momento (es decir, que no 
+        están prestadas). Se devuelve título y número de copias disponibles.
+        ·· 2-Optativa: Cuál es el género favorito de cada socios (el género del que tenga más préstamos). 
+        Se devuelve número de socio, nombre completo y género favorito.
 
 ¬ Material en el repositorio:
 
@@ -38,9 +46,17 @@
 
 ¬ Puntos a considerar:
 
-    · Se ha usado un CTE en lugar de view para añadir un año de publicación aleatorio a la tabla de películas, de manera que todos los títulos iguales compartan el mismo año. Se ha optado por ello al tratarse de una tabla virtual y temporal, que es borrada una vez realizada la consulta.
-    · Se ha añadido una copia de película extra al Señor de Los Anillos (id 309) para tener varias copias disponibles de un título y así poder testear que la consulta-1 funciona adecuadamente.
-    · Se ha hecho uso de la normalización, pero buscando un compromiso con las simplicidad. Así, se ha sacado el código postal fuera de dirección para representar la normalización de ese dato, pero se ha dejado la calle como dato sin más. La idea ha sido mostrar como sería el proceso, pero sin complicar/alargar en exceso el ejercicio.
+    · Se ha usado un CTE en lugar de view para añadir un año de publicación aleatorio
+     a la tabla de películas, de manera que todos los títulos iguales compartan el mismo año.
+     Se ha optado por ello al tratarse de una tabla virtual y temporal, que es borrada una 
+     vez realizada la consulta.
+    · Se ha añadido una copia de película extra al Señor de Los Anillos (id 309) para tener
+     varias copias disponibles de un título y así poder testear que la consulta-1 funciona 
+     adecuadamente.
+    · Se ha hecho uso de la normalización, pero buscando un compromiso con las simplicidad. 
+     Así, se ha sacado el código postal fuera de dirección para representar la normalización 
+     de ese dato, pero se ha dejado la calle como dato sin más. La idea ha sido mostrar como 
+     sería el proceso, pero sin complicar/alargar en exceso el ejercicio.
 
 ¬ Opciones de desarrollo futuro:
 
