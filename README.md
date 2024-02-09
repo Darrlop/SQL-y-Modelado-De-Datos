@@ -52,7 +52,7 @@
      vez realizada la consulta.
 
     · Se ha añadido una copia de película extra al Señor de Los Anillos (con id 309) para tener
-     varias copias disponibles de un título en el resultado de la Consulta-1 y así poder testear 
+     varias copias disponibles de un título en el resultado de la "Consulta-1" y así poder testear 
      que funciona adecuadamente.
 
     · En caso de que un cliente tenga un empate a número de películas alquiladas en más de
