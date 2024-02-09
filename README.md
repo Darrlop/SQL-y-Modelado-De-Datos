@@ -6,7 +6,9 @@
 ¬ La intención de este proyecto es aprender y asentar conocimientos sobre SQL. En él he usado el sistema de gestión de base de datos (SGBD) relacional **PostgreSQL**. Para ello se ha creado una base datos básica sobre un ficticio videoclub retro, centrándonos en el registro de préstamo e inventario de películas.
 
 ¬ Cómo herramientas, he usado:
+    
     · **ElephantSQL** https://customer.elephantsql.com/ como servicio de alojamiento de la base de datos, en su modalidad gratuita "Tiny Turtle".
+
     · **Dbeaver** como aplicación de software cliente de SQL y herramienta de administración de bases de datos. Es un software completo y muy versátil para administrar proyectos de BBDD si buscamos una opción gratuita.
 
 ¬ Las funcionalidades planteadas como requisitos mínimos serían:
