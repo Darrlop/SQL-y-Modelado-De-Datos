@@ -50,9 +50,14 @@
      a la tabla de películas, de manera que todos los títulos iguales compartan el mismo año.
      Se ha optado por ello al tratarse de una tabla virtual y temporal, que es borrada una 
      vez realizada la consulta.
+
     · Se ha añadido una copia de película extra al Señor de Los Anillos (id 309) para tener
      varias copias disponibles de un título y así poder testear que la consulta-1 funciona 
      adecuadamente.
+
+    · En caso de que un cliente tenga un empate a número de películas alquiladas en más de
+     un género, ofreceremos no un único género favorito, sino varios. 
+
     · Se ha hecho uso de la normalización, pero buscando un compromiso con las simplicidad. 
      Así, se ha sacado el código postal fuera de dirección para representar la normalización 
      de ese dato, pero se ha dejado la calle como dato sin más. La idea ha sido mostrar como 
