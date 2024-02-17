@@ -1,5 +1,10 @@
 -- ############# CREACIÓN DE BBDD/SCHEMA ############# --
 
+/*
+ * CIFRAS: 
+ * 49 socios, 100 títulos, copias 308/309,  prestamos 512	
+ * 5 pelis libres; 6 con la copia añadida de ESDLA
+ */
 
 
 DROP SCHEMA if exists videoclub CASCADE;
@@ -7,6 +12,7 @@ DROP SCHEMA if exists videoclub CASCADE;
 
 create schema if not exists videoclub;
 set schema 'videoclub';
+
 
 
 -- Tablas --
@@ -55,17 +61,32 @@ create table if not exists genero(
 	tipo_genero varchar(20) not null
 );
 
+
+create table if not exists copia(
+	id smallserial primary key,
+	id_peli smallint not null
+);
+
 create table if not exists prestamo(
 	id serial primary key,
 	id_socio smallint not null,
-	id_film smallint not null,
+	id_copia smallint not null,
 	fecha_prestamo date not null,
 	fecha_devolucion date
 );
 
 
-
 -- Relaciones --
+
+alter table direccion
+add constraint fk_cp_direccion
+foreign key (id_cp)
+references codigo_postal(id);
+
+alter table direccion 
+add constraint fk_socio_direccion
+foreign key (id_socio)
+references socio(id);
 
 alter table pelicula
 add constraint fk_genero_pelicula
@@ -77,23 +98,15 @@ add constraint fk_director_pelicula
 foreign key (id_director)
 references director(id);
 
-
-alter table direccion
-add constraint fk_cp_direccion
-foreign key (id_cp)
-references codigo_postal(id);
-
-
-alter table direccion 
-add constraint fk_socios_direccion
-foreign key (id_socio)
-references socio(id);
-
+alter table copia 
+add constraint fk_pelicula_copia
+foreign key (id_peli)
+references pelicula(id);
 
 alter table prestamo
-add constraint fk_pelicula_prestamo
-foreign key (id_film)
-references pelicula(id);
+add constraint fk_copia_prestamo
+foreign key (id_copia)
+references copia(id);
 
 alter table prestamo 
 add constraint fk_socio_prestamo
@@ -652,6 +665,7 @@ INSERT INTO tmp_videoclub (id_copia,fecha_alquiler_texto,dni,nombre,apellido_1,a
 
 
 	
+	
 -- ############# CARGA DE DATOS Y CONSULTAS SQL ############# --
 	
 	
@@ -663,12 +677,14 @@ select tv.genero from tmp_videoclub tv group by genero;
 
 --select g.tipo_genero from genero g; 
 
+
 -- Carga DIRECTOR
 
 insert into director(nombre_director)
 select tv.director from tmp_videoclub tv group by tv.director;  
 
 --select d.id, d.nombre_director from director d; 
+
 
 -- Carga CÓDIGO_POSTAL
 
@@ -677,12 +693,14 @@ select tv.codigo_postal from tmp_videoclub tv group by tv.codigo_postal;
 
 --select cp.numero_cp from codigo_postal cp; 
 
+
 -- Carga SOCIO
 -- 		Aplico to_date para adaptar la fecha a mi esquema
 
 insert into socio (dni, nombre, apellido1, apellido2, telefono,fecha_nacimiento)
 select distinct tv.dni, tv.nombre, tv.apellido_1, tv.apellido_2, tv.telefono, TO_DATE(tv.fecha_nacimiento, 'YYYY-MM-DD')
 from tmp_videoclub tv;
+
 
 -- Carga DIRECCIÓN
 
@@ -695,28 +713,21 @@ order by s.id;
 
 --select * from direccion d ;
 
+
 -- Carga PELÍCULA
 
-/*
- * 	alter table pelicula alter column anno_publicacion drop not null;
- * 	alter table pelicula
- * 	alter column titulo type varchar(80);
-*/
-
-insert into pelicula(id, titulo, sinopsis, id_director, id_genero)
-select distinct  tv.id_copia, tv.titulo, tv.sinopsis, d.id, g.id  
+insert into pelicula(titulo, sinopsis, id_director, id_genero)
+select distinct  tv.titulo, tv.sinopsis, d.id, g.id  
 from tmp_videoclub tv 
 inner join genero g on tv.genero = g.tipo_genero
 inner join director d on tv.director = d.nombre_director
-order by tv.id_copia; 
- 
+order by tv.titulo; 
 
 -- Añado aleatoriamente un año entre 1950 y 2020 al año de publicación
 /*
  * 	Uso un CTE (una tabla virtual y temporal que no cambia nuestra BBDD)
  *	para lograr que todos los títulos que son iguales compartan el mismo año aleatorio
 */
-
 with NumAleatorio as (
     select distinct titulo, FLOOR(random() * (2020 - 1950 + 1) + 1950)::int AS anno_aleatorio
     from pelicula
@@ -726,14 +737,32 @@ set anno_publicacion = na.anno_aleatorio
 from NumAleatorio na where p.titulo = na.titulo;
   
 
+-- Carga COPIA
+
+insert into copia (id, id_peli)
+select distinct  tv.id_copia, p.id
+from tmp_videoclub tv
+inner join pelicula p on tv.titulo = p.titulo
+order by id_copia ;
+
+/*Test tabla copia
+ *
+select c.id, c.id_peli, p.titulo  
+from copia c
+inner join pelicula p  on c.id_peli = p.id  
+order by c.id  ;
+*/
+
+
 -- Carga PRÉSTAMO
- 
-insert into prestamo (id_socio, id_film, fecha_prestamo, fecha_devolucion)
-select s.id, p.id, tv.fecha_alquiler, tv.fecha_devolucion  
+
+insert into prestamo (id_socio, id_copia, fecha_prestamo, fecha_devolucion)
+select s.id, c.id, tv.fecha_alquiler, tv.fecha_devolucion  
 from tmp_videoclub tv 
 inner join socio s on tv.dni = s.dni 
-inner join pelicula p on tv.id_copia = p.id;
---group by s.id, p.id, tv.fecha_alquiler, tv.fecha_devolucion order by s.id;
+inner join copia c on tv.id_copia = c.id;
+
+--select * from prestamo order by id ;
 
 
 
@@ -742,21 +771,25 @@ inner join pelicula p on tv.id_copia = p.id;
 
 /*
  * Antes añado una copia más del SDLA para que haya 2 copias libres y probar que el count funcione bien
+ * Id de la copia: 309. Id relativo a la peli del SDLA: 32
  */
 
-insert into pelicula (id, titulo, anno_publicacion, sinopsis, id_director, id_genero)
-values (309,'El señor de los anillos: La comunidad del anillo', 1966, 'En la Tierra Media, el Señor Oscuro Saurón creó los Grandes Anillos de Poder, forjados por los herreros Elfos. Tres para los reyes Elfos, siete para los Señores Enanos, y nueve para los Hombres Mortales. Secretamente, Saurón también forjó un anillo maestro, el Anillo Único, que contiene en sí el poder para esclavizar a toda la Tierra Media. Con la ayuda de un grupo de amigos y de valientes aliados, Frodo emprende un peligroso viaje con la misión de destruir el Anillo Único. Pero el Señor Oscuro Sauron, quien creara el Anillo, envía a sus servidores para perseguir al grupo. Si Sauron lograra recuperar el Anillo, sería el final de la Tierra Media.', 41, 6);
+insert into copia (id, id_peli)
+values (309, 32);
+
+--select * from copia c where id_peli = 32;
 
 
-select titulo, count(id)
+select titulo, count(c.id)
 from pelicula p
+inner join copia c on p.id = c.id_peli  
 where not exists (
-	select pr.id_film  
+	select pr.id_copia 
 	-- opc: poner un simple select 1. La idea es devolver algo si cumple la condición para testear el exist de arriba
 	from prestamo pr
-	where p.id = pr.id_film and pr.fecha_devolucion is null
+	where pr.id_copia = c.id and pr.fecha_devolucion is null
 	)
-group by titulo;
+group by titulo order by titulo;
 
 
 /* Otra manera-> con "not in"
@@ -772,41 +805,31 @@ group by titulo ;
 */
 
 
-
 -- -- CONSULTA 2 -- --
 
-
-create view v_prestamo_pelicula_genero as
+ 
+create view v_prest_copi_peli_gen as
 	select id_socio, tipo_genero, count(g.id) as cuenta
 	from prestamo pr
-	inner join pelicula p on pr.id_film = p.id
+	inner join copia c on pr.id_copia = c.id
+	inner join pelicula p on c.id_peli = p.id 
 	inner join genero g on p.id_genero = g.id
 	group by id_socio, tipo_genero
-	order by id_socio; 
-
- 
-create view v_mas_vistas as
-	select id_socio, MAX(cuenta) as maxi
-	from v_prestamo_pelicula_genero vppg 
-	group by id_socio
 	order by id_socio;
 
+create view v_mas_vistas as
+	select id_socio, MAX(cuenta) as maxi
+	from v_prest_copi_peli_gen vpcpg 
+	group by id_socio
+	order by id_socio;
+ 
 
 -- Si un cliente tiene varios generos con mismo número de visualizaciones,
 -- añadiremos todos ellos como géneros favoritos
 
-select s.id, s.nombre, s.apellido1, s.apellido2, vppg.tipo_genero
+select s.id, s.nombre, s.apellido1, s.apellido2, vpcpg.tipo_genero
 from socio s
-inner join v_prestamo_pelicula_genero vppg on s.id = vppg.id_socio
-inner join v_mas_vistas vmv on vppg.id_socio = vmv.id_socio
-where vppg.cuenta = vmv.maxi
-;
+inner join v_prest_copi_peli_gen vpcpg on s.id = vpcpg.id_socio
+inner join v_mas_vistas vmv on vpcpg.id_socio = vmv.id_socio
+where vpcpg.cuenta = vmv.maxi;
 
-
-
-
-
-
-
-	
-	
