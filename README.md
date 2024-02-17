@@ -33,7 +33,8 @@
 ¬ Material en el repositorio:
 
     · Diagrama Entidad/Relación -> videoclub.drawio:
-        · Tablas: Socio, Dirección, Código_Postal, Película, Género, Director y Préstamo
+        · Tablas: Socio, Dirección, Código_Postal, Película, Género, Director, Copia y
+         Préstamo
         · Claves primarias y foráneas.
         · Relaciones entre tablas
         · Se han usado reglas de normalización en la elaboración
